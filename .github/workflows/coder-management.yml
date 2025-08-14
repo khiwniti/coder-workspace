@@ -1,0 +1,70 @@
+name: Coder Workspace Management
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to perform'
+        required: true
+        default: 'list'
+        type: choice
+        options:
+        - list
+        - create
+        - stop
+        - delete
+      workspace_name:
+        description: 'Workspace name (required for create/stop/delete)'
+        required: false
+        type: string
+      template_name:
+        description: 'Template name (required for create)'
+        required: false
+        type: string
+
+jobs:
+  manage-workspace:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Coder
+        uses: coder/setup-action@v1
+        with:
+          access_url: 'https://coder.example.com'  # Replace with your actual Coder deployment URL
+          coder_session_token: ${{ secrets.CODER_SESSION_TOKEN }}
+      
+      - name: Verify Coder authentication
+        run: coder version
+      
+      - name: List workspaces
+        if: github.event.inputs.action == 'list'
+        run: coder list
+      
+      - name: Create workspace
+        if: github.event.inputs.action == 'create'
+        run: |
+          if [ -z "${{ github.event.inputs.workspace_name }}" ] || [ -z "${{ github.event.inputs.template_name }}" ]; then
+            echo "Error: workspace_name and template_name are required for create action"
+            exit 1
+          fi
+          coder create ${{ github.event.inputs.workspace_name }} --template ${{ github.event.inputs.template_name }}
+      
+      - name: Stop workspace
+        if: github.event.inputs.action == 'stop'
+        run: |
+          if [ -z "${{ github.event.inputs.workspace_name }}" ]; then
+            echo "Error: workspace_name is required for stop action"
+            exit 1
+          fi
+          coder stop ${{ github.event.inputs.workspace_name }}
+      
+      - name: Delete workspace
+        if: github.event.inputs.action == 'delete'
+        run: |
+          if [ -z "${{ github.event.inputs.workspace_name }}" ]; then
+            echo "Error: workspace_name is required for delete action"
+            exit 1
+          fi
+          coder delete ${{ github.event.inputs.workspace_name }} --yes

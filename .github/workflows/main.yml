@@ -1,9 +1,21 @@
+name: Setup Coder
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
 jobs:
   setup-coder:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
       - name: Setup Coder
         uses: coder/setup-action@v1
         with:
-          access_url: 'https://localhost:7080'
-          coder_session_token: ${{ ClygyUKkHk-epTYRdswuMnvWkXZaxQ0Ha }}
+          access_url: 'https://coder.example.com'  # Replace with your actual Coder deployment URL
+          coder_session_token: ${{ secrets.CODER_SESSION_TOKEN }}
