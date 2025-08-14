@@ -1,0 +1,9 @@
+jobs:
+  setup-coder:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Coder
+        uses: coder/setup-action@v1
+        with:
+          access_url: 'https://localhost:7080'
+          coder_session_token: ${{ ClygyUKkHk-epTYRdswuMnvWkXZaxQ0Ha }}
